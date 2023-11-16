@@ -31,7 +31,7 @@ class CriminalDetails : Fragment() {
         crime = Crime(
             id = UUID.randomUUID(),
             title = "",
-            date = "2022-05-22",
+            date = Date(),
             isSolved = false,
             requirePolice = true
         )

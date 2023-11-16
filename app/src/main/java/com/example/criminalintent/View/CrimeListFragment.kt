@@ -8,9 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import com.example.criminalintent.Model.Crime
 import com.example.criminalintent.ViewModel.CrimeListViewModel
 import com.example.criminalintent.databinding.FragmentCrimeListBinding
+import kotlinx.coroutines.launch
 
 const val TAG = "CrimeListFragment"
 
@@ -22,33 +25,38 @@ class CrimeListFragment : Fragment() {
 
     private lateinit var recycleView: RecyclerView
     private lateinit var adapter: ViewAdapter
-    private lateinit var binding: FragmentCrimeListBinding
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.d(TAG, "${crimeListViewModel.crimes.size}")
-        crimeListViewModel.crimes.forEach {
-            Log.d(TAG, "${it.title} and ${it.requirePolice}")
+    private var _binding: FragmentCrimeListBinding? = null
+    private val binding
+        get() = checkNotNull(_binding) {
+            "Cannot access binding"
         }
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentCrimeListBinding.inflate(layoutInflater, container, false)
+        _binding = FragmentCrimeListBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recycleView = binding.crimeRecyclerView
-        updateUI(view.context)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            crimeListViewModel.crimes.collect {
+                updateUI(view.context, it)
+            }
+        }
     }
 
-    private fun updateUI(context: Context) {
-        val crimes = crimeListViewModel.crimes
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    private fun updateUI(context: Context, crimes: List<Crime>) {
         adapter = ViewAdapter(crimes, context)
         recycleView.adapter = adapter
     }

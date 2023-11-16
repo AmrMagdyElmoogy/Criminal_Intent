@@ -76,7 +76,7 @@ class CrimeViewHolder(view: View) : ViewHolder(view), HolderInterface {
 
     override fun bind(crime: Crime) {
         titleTextView.text = crime.title
-        dateTextView.text = crime.date
+        dateTextView.text = crime.date.toString()
         if (!crime.requirePolice)
             binding.CrimeSolved.visibility = View.GONE
         else
@@ -106,7 +106,7 @@ class CrimeViewHolderSerious(view: View) : ViewHolder(view), HolderInterface {
 
     override fun bind(crime: Crime) {
         titleTextView.text = crime.title
-        dateTextView.text = crime.date
+        dateTextView.text = crime.date.toString()
     }
 
 
