@@ -6,5 +6,4 @@ import com.example.criminalintent.Model.Crime
 interface HolderInterface {
     val titleTextView: TextView
     val dateTextView: TextView
-    fun bind(crime: Crime)
 }

@@ -2,20 +2,21 @@ package com.example.criminalintent.View
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.criminalintent.Model.Crime
+import com.example.criminalintent.R
 import com.example.criminalintent.ViewModel.CrimeListViewModel
 import com.example.criminalintent.databinding.FragmentCrimeListBinding
 import kotlinx.coroutines.launch
 
-const val TAG = "CrimeListFragment"
 
 class CrimeListFragment : Fragment() {
 
@@ -57,7 +58,13 @@ class CrimeListFragment : Fragment() {
     }
 
     private fun updateUI(context: Context, crimes: List<Crime>) {
-        adapter = ViewAdapter(crimes, context)
+        adapter = ViewAdapter(crimes, context) {
+            findNavController().navigate(
+                CrimeListFragmentDirections.actionCrimeListFragmentToCriminalDetails(
+                    it
+                )
+            )
+        }
         recycleView.adapter = adapter
     }
 
