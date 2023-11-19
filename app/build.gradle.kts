@@ -5,7 +5,6 @@ plugins {
     id("com.google.devtools.ksp")
     id("androidx.navigation.safeargs.kotlin")
 }
-
 android {
     namespace = "com.example.criminalintent"
     compileSdk = 34
@@ -16,11 +15,15 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
+        debug {
+
+            buildConfigField("String", "API_URL", "\"https://www.google.com\"")
+        }
+
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -32,6 +35,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
