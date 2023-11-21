@@ -72,25 +72,17 @@ class CriminalDetails : Fragment() {
                 }
             }
         }
-        setFragmentResultListener(DatePickerFragment.REQUEST_CODE) { _, bundle ->
-            var newDate: Date? = null
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                newDate =
-                    bundle.getSerializable(DatePickerFragment.BUNDLE_KEY, Date::class.java) as Date
-            }
-            newDate = bundle.getSerializable(DatePickerFragment.BUNDLE_KEY) as Date
-
+        setFragmentResultListener(DatePickerFragment.REQUEST_CODE_1) { _, bundle ->
+            val newDate = bundle.getLong(DatePickerFragment.BUNDLE_KEY_1)
             viewModel.updateCrime {
-                it.copy(date = newDate)
+                it.copy(date = Date(newDate))
             }
         }
 
-        setFragmentResultListener(TimePickerFragment.REQUEST_CODE){_,bundle->
-            var newTime: String? = null
-            newTime = bundle.getString(TimePickerFragment.BUNDLE_KEY)
+        setFragmentResultListener(TimePickerFragment.REQUEST_CODE) { _, bundle ->
+            var newTime: String? = bundle.getString(TimePickerFragment.BUNDLE_KEY)
             binding.crimeTime.text = newTime
         }
-
 
     }
 
