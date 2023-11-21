@@ -42,6 +42,8 @@ class CrimeRepository private constructor(context: Context) {
         }
     }
 
+    suspend fun deleteCrime(crime: CrimeEntity) = dao.delete(crime)
+
     suspend fun insert(crime: CrimeEntity) = dao.insert(crime)
 
     companion object {

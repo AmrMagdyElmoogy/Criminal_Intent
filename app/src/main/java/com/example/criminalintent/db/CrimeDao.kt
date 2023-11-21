@@ -1,6 +1,7 @@
 package com.example.criminalintent.db
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -22,4 +23,7 @@ interface CrimeDao {
 
     @Insert(entity = CrimeEntity::class, onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(crime: CrimeEntity): Long
+
+    @Delete
+    suspend fun delete(crime: CrimeEntity)
 }

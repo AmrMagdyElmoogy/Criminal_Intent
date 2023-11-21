@@ -9,4 +9,6 @@
     <string name="contact_police">Contact Police</string>
     <string name="picture_of_crime_solved">Picture of Crime Solved</string>
     <string name="time">12:00AM</string>
+    <string name="new_crime">New Crime</string>
+    <string name="EmptyList">There aren\'t crimes yet!</string>
 </resources>
