@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import com.example.criminalintent.ContactProviderInterface
 import com.example.criminalintent.Model.Crime
 import com.example.criminalintent.Repository.CrimeRepository
 import com.example.criminalintent.db.toUiCrime
@@ -19,6 +20,15 @@ class CrimeDetailsViewModel(
 ) : ViewModel() {
 
     private val repo = CrimeRepository.get()
+
+    var suspectPhoneNumber: StringBuffer = StringBuffer("")
+        private set
+
+    fun updatePhoneNumber(number: String) {
+        suspectPhoneNumber.removeRange(0, suspectPhoneNumber.length)
+        suspectPhoneNumber.append("+20 $number")
+    }
+
 
     // This crime object is for all operations here
     private val _crime: MutableStateFlow<Crime?> = MutableStateFlow(null)

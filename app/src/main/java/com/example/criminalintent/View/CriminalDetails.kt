@@ -1,5 +1,6 @@
 package com.example.criminalintent.View
 
+import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -26,12 +27,16 @@ import com.example.criminalintent.Model.Crime
 import com.example.criminalintent.R
 import com.example.criminalintent.ViewModel.CrimeDetailsViewModel
 import com.example.criminalintent.ViewModel.CrimeDetailsViewModelFactory
+import com.example.criminalintent.canResolveAction
 import com.example.criminalintent.databinding.FragmentCriminalDetailsBinding
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.util.Date
 
+private const val DISPLAY_NAME = ContactsContract.Contacts.DISPLAY_NAME
+private const val CONTACT_ID = ContactsContract.Contacts._ID
+private const val NUMBER = ContactsContract.CommonDataKinds.Phone.NUMBER
 
 class CriminalDetails : Fragment() {
     private val args: CriminalDetailsArgs by navArgs()
@@ -40,15 +45,33 @@ class CriminalDetails : Fragment() {
         ActivityResultContracts.PickContact()
     ) {
         it?.let {
-            parseContactSelection(it)
+            getSuspectName(it)
         }
     }
+
+
     private val viewModel by viewModels<CrimeDetailsViewModel> {
         CrimeDetailsViewModelFactory(crimeID)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val requestPermissionLauncher =
+            registerForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { isGranted: Boolean ->
+                if (isGranted) {
+                    // Permission is granted. Continue the action or workflow in your
+                    // app.
+                } else {
+                    // Explain to the user that the feature is unavailable because the
+                    // feature requires a permission that the user has denied. At the
+                    // same time, respect the user's decision. Don't link to system
+                    // settings in an effort to convince the user to change their
+                    // decision.
+                }
+            }
+        requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
         requireActivity().onBackPressedDispatcher.addCallback {
             this.isEnabled =
                 (binding.crimeTitle.text.isEmpty() || binding.crimeTitle.text.isBlank())
@@ -94,7 +117,7 @@ class CriminalDetails : Fragment() {
         }
 
         setFragmentResultListener(TimePickerFragment.REQUEST_CODE) { _, bundle ->
-            var newTime: String? = bundle.getString(TimePickerFragment.BUNDLE_KEY)
+            val newTime: String? = bundle.getString(TimePickerFragment.BUNDLE_KEY)
             binding.crimeTime.text = newTime
         }
 
@@ -114,32 +137,6 @@ class CriminalDetails : Fragment() {
 
     }
 
-    private fun parseContactSelection(uri: Uri) {
-        val queryField = arrayOf(ContactsContract.Contacts.DISPLAY_NAME)
-
-        val queryCursor = requireActivity().contentResolver.query(
-            uri, queryField, null, null, null
-        )
-        queryCursor?.use { cursor ->
-            if (cursor.moveToNext()) {
-                val suspect = cursor.getString(0)
-                viewModel.updateCrime {
-                    it.copy(suspect = suspect)
-                }
-            }
-
-        }
-    }
-
-    private fun canResolveIntent(intent: Intent): Boolean {
-        val packageManager = requireActivity().packageManager
-        val resolvedActivity = packageManager.resolveActivity(
-            intent,
-            PackageManager.MATCH_DEFAULT_ONLY
-        )
-        return resolvedActivity != null
-    }
-
     private fun updateUI(crime: Crime) {
         updateTitleOfCrime(crime)
         updateDateOfCrime(crime)
@@ -147,7 +144,17 @@ class CriminalDetails : Fragment() {
         updateTimeOfCrime(crime)
         updateCrimeSuspectText(crime)
         fireIntentForCrimeReport(crime)
-        fireIntnetForCrimeSuspect()
+        fireIntentForCrimeSuspect()
+        callingSuspect()
+    }
+
+    private fun callingSuspect() {
+        binding.call.isEnabled = Intent(Intent.ACTION_DIAL).canResolveAction(requireActivity())
+        binding.call.setOnClickListener {
+            val uri = Uri.parse("tel:${viewModel.suspectPhoneNumber}")
+            val intent = Intent(Intent.ACTION_DIAL, uri)
+            startActivity(intent)
+        }
     }
 
     private fun updateCrimeSuspectText(crime: Crime) {
@@ -156,13 +163,12 @@ class CriminalDetails : Fragment() {
         }
     }
 
-    private fun fireIntnetForCrimeSuspect() {
+    private fun fireIntentForCrimeSuspect() {
         val selectSuspectIntent = selectSuspectContact.contract.createIntent(
             requireContext(),
             null
         )
-
-        binding.crimeSuspect.isEnabled = canResolveIntent(selectSuspectIntent)
+        binding.crimeSuspect.isEnabled = selectSuspectIntent.canResolveAction(requireActivity())
         binding.crimeSuspect.setOnClickListener {
             selectSuspectContact.launch(null)
         }
@@ -170,12 +176,13 @@ class CriminalDetails : Fragment() {
 
     private fun fireIntentForCrimeReport(crime: Crime) {
         binding.crimeReport.setOnClickListener {
-            val reportIntent = Intent(Intent.ACTION_SEND).apply {
+            /*val reportIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, crime.suspect)
                 putExtra(Intent.EXTRA_SUBJECT, getCrimeReport(crime))
             }
-            startActivity(reportIntent)
+            startActivity(reportIntent)*/
+            parseContactSelection(crime)
         }
     }
 
@@ -193,6 +200,66 @@ class CriminalDetails : Fragment() {
             crimeSolved.setOnCheckedChangeListener { _, isChecked ->
                 viewModel.updateCrime {
                     it.copy(isSolved = isChecked)
+                }
+            }
+        }
+    }
+
+    private fun parseContactSelection(crime: Crime) {
+        val queryField = arrayOf(
+            ContactsContract.Contacts.DISPLAY_NAME,
+            ContactsContract.Contacts._ID
+        )
+
+        val queryCursor = requireActivity().contentResolver.query(
+            ContactsContract.Contacts.CONTENT_URI, queryField, null, null, null
+        )
+        queryCursor?.use { cursor ->
+            while (cursor.moveToNext()) {
+                val displayNameIndex = cursor.getColumnIndex(DISPLAY_NAME)
+                val displayName = cursor.getString(displayNameIndex)
+                if (displayName == crime.suspect) {
+                    val contactIDIndex =
+                        cursor.getColumnIndex(CONTACT_ID)
+                    val id = cursor.getString(contactIDIndex)
+                    extractPhoneNumberSuspect(id)
+                }
+            }
+
+        }
+    }
+
+    private fun extractPhoneNumberSuspect(id: String?) {
+        val queryField = arrayOf(NUMBER)
+        val queryCursor = requireActivity().contentResolver.query(
+            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+            queryField,
+            "${ContactsContract.CommonDataKinds.Phone.CONTACT_ID} = ?",
+            arrayOf(id),
+            null
+        )
+        queryCursor?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val phoneNumberIndex = cursor.getColumnIndex(NUMBER)
+                viewModel.updatePhoneNumber(cursor.getString(phoneNumberIndex))
+            } else {
+                binding.crimeDate.text = " "
+            }
+        }
+    }
+
+    private fun getSuspectName(uri: Uri) {
+        val queryField = arrayOf(ContactsContract.Contacts.DISPLAY_NAME)
+
+        val queryCursor = requireActivity().contentResolver.query(
+            uri, queryField, null, null, null
+        )
+
+        queryCursor?.use { cursor ->
+            if (cursor.moveToNext()) {
+                val suspect = cursor.getString(0)
+                viewModel.updateCrime {
+                    it.copy(suspect = suspect)
                 }
             }
         }
@@ -222,7 +289,6 @@ class CriminalDetails : Fragment() {
             }
         }
     }
-
 
 
     override fun onDestroyView() {
