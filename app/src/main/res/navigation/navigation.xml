@@ -36,7 +36,7 @@
         android:label="DatePickerFragment" >
         <argument
             android:name="crimeDate"
-            app:argType="java.util.Date" />
+            app:argType="java.time.LocalDate" />
     </dialog>
     <dialog
         android:id="@+id/timePickerFragment"

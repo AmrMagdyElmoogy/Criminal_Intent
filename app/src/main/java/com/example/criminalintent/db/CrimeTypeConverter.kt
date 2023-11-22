@@ -1,6 +1,9 @@
 package com.example.criminalintent.db
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.room.TypeConverter
+import java.time.LocalDate
 import java.util.Date
 import java.util.UUID
 
@@ -16,13 +19,15 @@ class CrimeTypeConverters {
         return UUID.fromString(str)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter
-    fun fromDate(date: Date): Long {
-        return date.time
+    fun fromDate(date: LocalDate): Long {
+        return date.toEpochDay()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter
-    fun toDate(millisSinceEpoch: Long): Date {
-        return Date(millisSinceEpoch)
+    fun toDate(millisSinceEpoch: Long): LocalDate {
+        return LocalDate.ofEpochDay(millisSinceEpoch)
     }
 }

@@ -2,6 +2,7 @@ package com.example.criminalintent.View
 
 import android.content.Context
 import android.opengl.Visibility
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -11,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
@@ -24,6 +26,7 @@ import com.example.criminalintent.SwipeToDelete
 import com.example.criminalintent.ViewModel.CrimeListViewModel
 import com.example.criminalintent.databinding.FragmentCrimeListBinding
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.util.Date
 import java.util.UUID
 
@@ -36,9 +39,6 @@ class CrimeListFragment : Fragment() {
     private lateinit var itemTouchHelper: ItemTouchHelper
     private lateinit var recycleView: RecyclerView
     private lateinit var adapter: ViewAdapter
-/*    private lateinit var emptyImage: ImageView
-    private lateinit var emptyTextView: TextView*/
-
     private lateinit var emptyListView: ConstraintLayout
     private var _binding: FragmentCrimeListBinding? = null
     private val binding
@@ -58,6 +58,7 @@ class CrimeListFragment : Fragment() {
         inflater.inflate(R.menu.fragment_crime_list, menu)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Deprecated(
         "Deprecated in Java", ReplaceWith(
             "super.onOptionsItemSelected(item)",
@@ -75,12 +76,13 @@ class CrimeListFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun writeNewCrime() {
         viewLifecycleOwner.lifecycleScope.launch {
             val newCrime = Crime(
                 id = UUID.randomUUID(),
                 title = "",
-                date = Date(),
+                date = LocalDate.now(),
                 isSolved = false,
                 requirePolice = false
             )

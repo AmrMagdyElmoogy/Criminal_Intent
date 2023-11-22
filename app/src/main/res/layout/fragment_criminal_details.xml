@@ -99,4 +99,29 @@
         android:orientation="vertical"
         app:layout_constraintGuide_begin="200dp" />
 
+    <Button
+        android:id="@+id/crime_suspect"
+        style="@style/ButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:text="@string/crime_suspect_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/crime_solved"
+        tools:text="@string/crime_suspect_text" />
+
+    <Button
+        android:id="@+id/crime_report"
+        style="@style/ButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/crime_report_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/crime_suspect"
+        tools:text="@string/crime_report_text" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
