@@ -7,6 +7,7 @@ import com.example.criminalintent.Model.toCrimeEntity
 import com.example.criminalintent.db.CrimeDatabase
 import com.example.criminalintent.db.CrimeEntity
 import com.example.criminalintent.db.migration2_3
+import com.example.criminalintent.db.migration3_4
 import com.example.criminalintent.db.toUiCrime
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +22,7 @@ private const val DATABASE_NAME = "crime-database"
 class CrimeRepository private constructor(context: Context) {
 
     private val database = Room.databaseBuilder(context, CrimeDatabase::class.java, DATABASE_NAME)
-        .addMigrations(migration2_3)
+        .addMigrations(migration2_3, migration3_4)
         .build()
 
     private val dao = database.dao()

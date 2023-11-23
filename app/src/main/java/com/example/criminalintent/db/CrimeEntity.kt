@@ -19,7 +19,9 @@ data class CrimeEntity(
     @ColumnInfo(name = "isSolved")
     val isSolved: Boolean,
     @ColumnInfo(name = "suspect")
-    val suspect: String
+    val suspect: String,
+    @ColumnInfo(name = "photoFileName")
+    val photoFileName: String? = null
 ) {
 }
 
@@ -30,6 +32,7 @@ fun CrimeEntity.toUiCrime(): Crime {
         date = date,
         isSolved = isSolved,
         requirePolice = false,
-        suspect = suspect
+        suspect = suspect,
+        photoFileName = photoFileName
     )
 }

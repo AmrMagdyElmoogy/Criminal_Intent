@@ -5,6 +5,7 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
 
         <item name="ic_menu">@drawable/ic_menu_idd</item>
+        <item name="ic_camera">@drawable/ic_camera_dark</item>
     </style>
 
     <style name="Theme.CriminalIntent" parent="Base.Theme.CriminalIntent" />

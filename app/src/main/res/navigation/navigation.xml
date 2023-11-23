@@ -28,6 +28,13 @@
         <action
             android:id="@+id/selectTime"
             app:destination="@id/timePickerFragment" />
+        <action
+            android:id="@+id/zoom_in_action"
+            app:destination="@id/zoomedInCrimePhotoFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
     </fragment>
     <dialog
         android:id="@+id/datePickerDialog"
@@ -47,4 +54,15 @@
             app:argType="string"
             android:defaultValue="12:00AM" />
     </dialog>
+    <fragment
+        android:id="@+id/zoomedInCrimePhotoFragment"
+        android:name="com.example.criminalintent.View.ZoomedInCrimePhotoFragment"
+        android:label="ZoomedInCrimePhotoFragment" >
+        <argument
+            android:name="bitmapImage"
+            app:argType="android.graphics.Bitmap" />
+        <argument
+            android:name="crimeSuspect"
+            app:argType="string" />
+    </fragment>
 </navigation>

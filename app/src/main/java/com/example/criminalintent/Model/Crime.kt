@@ -11,7 +11,8 @@ data class Crime(
     val date: LocalDate,
     val isSolved: Boolean,
     val requirePolice: Boolean,
-    val suspect: String = ""
+    val suspect: String = "",
+    val photoFileName: String? = null
 )
 
 fun Crime.toCrimeEntity(): CrimeEntity =
@@ -20,5 +21,6 @@ fun Crime.toCrimeEntity(): CrimeEntity =
         title = this.title,
         date = this.date,
         isSolved = this.isSolved,
-        suspect = this.suspect
+        suspect = this.suspect,
+        photoFileName = this.photoFileName
     )
